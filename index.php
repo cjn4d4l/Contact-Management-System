@@ -8,6 +8,7 @@ include('C:\xampp\htdocs\Contact Management System\backend\db_connection.php');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="./assets/telephone.png" type="image/x-icon" >
     <title>Contacts</title>
     <style>
         * {
@@ -78,6 +79,22 @@ include('C:\xampp\htdocs\Contact Management System\backend\db_connection.php');
             height: 30px;
             cursor: pointer;
         }
+
+        table {
+            width: 800px;
+            border: 3px solid black;
+            border-radius: 10px;
+        }
+
+        th {
+            height: 50px;
+            border-bottom: solid 2px black;
+        }
+
+        td {
+            height: 40px;
+            text-align: center;
+        }
     </style>
 </head>
 
@@ -91,7 +108,20 @@ include('C:\xampp\htdocs\Contact Management System\backend\db_connection.php');
         </nav>
     </header>
     <main>
-        <p id="contacts">Contacts Go Here</p>
+        <!-- <p id="contacts">Contacts Go Here</p> -->
+        <center>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Contact ID</th>
+                        <th>Contact Name</th>
+                        <th>Contact Number</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+        </center>
     </main>
     <dialog id="addDialog">
         <h3>Add a Contact</h3>
@@ -126,7 +156,7 @@ include('C:\xampp\htdocs\Contact Management System\backend\db_connection.php');
             document.getElementById(id).showModal();
         }
 
-        function clearInputs () {
+        function clearInputs() {
             document.getElementById("contact_name").value = "";
             document.getElementById("contact_number").value = "";
             document.getElementById("contact_id").value = "";
@@ -138,16 +168,16 @@ include('C:\xampp\htdocs\Contact Management System\backend\db_connection.php');
             let contact_number = document.getElementById("contact_number").value;
             console.log("Gumana");
             fetch('addContact.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: `contact_name=${encodeURIComponent(contact_name)}&contact_number=${encodeURIComponent(contact_number)}`
-            })
-            .then(Response => Response.text())
-            .then(data => {
-                document.getElementById("message").innerHTML = data;
-            })
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `contact_name=${encodeURIComponent(contact_name)}&contact_number=${encodeURIComponent(contact_number)}`
+                })
+                .then(Response => Response.text())
+                .then(data => {
+                    document.getElementById("message").innerHTML = data;
+                })
             clearInputs();
         })
 
@@ -155,30 +185,40 @@ include('C:\xampp\htdocs\Contact Management System\backend\db_connection.php');
             e.preventDefault();
             const contact_id = document.getElementById("contact_id").value;
             console.log(contact_id);
-            fetch('deleteContact.php',{
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: `contact_id=${encodeURIComponent(contact_id)}`
-            })
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById("deleteMessage").innerHTML = data;
-            })
+            fetch('deleteContact.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `contact_id=${encodeURIComponent(contact_id)}`
+                })
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById("deleteMessage").innerHTML = data;
+                })
             clearInputs();
         })
 
-        function renderContacts () {
-            console.log("rendered");
+        function renderContacts() {
             fetch('renderContact.php')
-            .then(Response => Response.text())
-            .then(data => {
-                document.getElementById("contacts").innerHTML = data
-            })
-            setTimeout(renderContacts, 2000);
+                .then(Response => Response.json())
+                .then(contacts => {
+                    const tableBody = document.getElementById("tableBody");
+                    tableBody.innerHTML = "";
+                    contacts.forEach(contact => {
+                        const row = `
+                            <tr>
+                                <td>${contact.contact_id}</td>
+                                <td>${contact.contact_name}</td>
+                                <td>${contact.contact_number}</td>
+                            </tr>
+                        `
+                        tableBody.innerHTML += row;
+                    });
+                })
         }
-        renderContacts();
+        document.addEventListener("DOMContentLoaded", renderContacts);
+        setInterval(renderContacts, 2000);
     </script>
 </body>
 

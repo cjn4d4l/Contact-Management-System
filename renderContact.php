@@ -1,14 +1,15 @@
 <?php
-include('C:\xampp\htdocs\Contact Management System\backend\db_connection.php');
+header('Content-Type: application/json');
+$conn = new mysqli("127.0.0.1:3307", "root", "thisisnewpassword", "conms");
 $sql = "SELECT * FROM contacts";
 $result = $conn->query($sql);
-$response = "";
+$contacts = [];
 
-if (mysqli_num_rows($result) > 0) {
+if ($result->num_rows > 0) {
     while ($rows = $result->fetch_assoc()) {
-        $response .= $rows['contact_id'] . " " . $rows['contact_name'] . " " . $rows['contact_number'] . "<br>";
+        $contacts[] = $rows;
     }
 }
 
-echo $response;
+echo json_encode($contacts);
 ?>

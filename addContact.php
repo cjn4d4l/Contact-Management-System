@@ -8,6 +8,11 @@ if ($contact_name === null || $contact_number === null) {
     return;
 }
 
+if (preg_match("/[a-z]/i", $contact_number)) {
+    echo "Invalid Contact Number";
+    return;
+}
+
 if (strlen($contact_number) < 11) {
     echo "Invalid Contact Number";
     return;
